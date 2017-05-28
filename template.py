@@ -105,34 +105,6 @@ class CLIHandler():
         self._commands.update({'test'  : [ self._run_test,    1 ]})
         self._commands.update({'hello' : [ self._greet_hello, 1 ]}) # Sample code
 
-    def show_usage(self):
-        """
-NAME
-    %s - A python script template
-
-SYNOPSIS
-    %s [<options>] <commands> [<arguments>]
-
-DESCRIPTION
-    A simple template for implementating python scripts
-
-COMMANDS
-%s
-OPTIONS
-    --verbose
-        Verbose output
-
-VERSION
-    0.10
-
-CONTACT
-    email@address
-"""
-        commands = ""
-        for command in self._commands.keys():
-            commands += "    - %s\n" % command
-        out = self.show_usage.__doc__ % (Filename, Filename, commands)
-        print(out)
 
     def _get_command_info(self, command):
         name = None
@@ -179,6 +151,35 @@ CONTACT
         else:
             print("ERROR: Unknown command '%s'" % command)
             print("Run '%s' to see list of supported commands" % Filename) 
+
+    def show_usage(self):
+        """
+NAME
+    %s - A python script template
+
+SYNOPSIS
+    %s [<options>] <commands> [<arguments>]
+
+DESCRIPTION
+    A simple template for implementating python scripts
+
+COMMANDS
+%s
+OPTIONS
+    --verbose
+        Verbose output
+
+VERSION
+    0.10
+
+CONTACT
+    email@address
+"""
+        commands = ""
+        for command in self._commands.keys():
+            commands += "    - %s\n" % command
+        out = self.show_usage.__doc__ % (Filename, Filename, commands)
+        print(out)
 
     def _show_help(self, args):
         """
