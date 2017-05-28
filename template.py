@@ -101,14 +101,22 @@ class CLIHandler():
 
     def __init__(self):
         self._commands = {}
-        self._commands.update({'help'  : [ self._show_help,   1 ]})
-        self._commands.update({'test'  : [ self._run_test,    1 ]})
-        self._commands.update({'hello' : [ self._greet_hello, 1 ]}) # Sample code
-
+        self._commands['help'] = {
+            'handler' : self._show_help,
+            'num_args' : 1,
+        }
+        self._commands['test'] = {
+            'handler' : self._run_test,
+            'num_args' : 1,
+        }
+        self._commands['hello'] = {             # Sample code
+            'handler' : self._greet_hello,
+            'num_args' : 1,
+        }
 
     def _get_command_info(self, command):
         name = None
-        info = []
+        info = {}
         if command in self._commands.keys():
             name = command
             info = self._commands[command]
@@ -141,8 +149,8 @@ class CLIHandler():
         command = args[0]
         name, info = self._get_command_info(command)
         if name != None:
-            handler = info[0]
-            arg_num = info[1]
+            handler = info['handler']
+            arg_num = info['num_args']
             if len(args[1:]) >= arg_num:
                 handler(args[1:])
             else:
@@ -192,7 +200,7 @@ DESCRIPTION
         command = args[0]
         name, info = self._get_command_info(command)
         if name != None:
-            handler = info[0]
+            handler = info['handler']
             print(handler.__doc__ % Filename)
         else:
             print("ERROR: Unknown command %s" % command)
