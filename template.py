@@ -5,7 +5,8 @@ import sys
 import getopt
 import unittest
 
-Options = { 'verbose' : 0 }
+Options = { 'verbose' : 0,
+            'include-msg' : '' }
 
 #   Sample code.
 #
@@ -14,8 +15,10 @@ class Greetings:
     def __init__(self):
         pass
 
-    def hello(self, name):
+    def hello(self, name, msg=''):
         greeting = "Hello %s." % name
+        if msg != "":
+            greeting += " %s" % msg
         return greeting
 
     def good_morning(self, name):
@@ -99,6 +102,13 @@ class UnitTest:
 
 class CLIHandler():
 
+    _optionHelp = {
+        'include-msg' : {
+            'desc' : 'Include message in greeting.',
+            'values' : ['message'],
+        },
+    }
+
     def __init__(self):
         self._commands = {}
         self._commands['help'] = {
@@ -112,6 +122,7 @@ class CLIHandler():
         self._commands['hello'] = {             # Sample code
             'handler' : self._greet_hello,
             'num_args' : 1,
+            'options' : ['include-msg']
         }
 
     def _get_command_info(self, command):
@@ -196,12 +207,35 @@ SYNOPSIS
 
 DESCRIPTION
     Show help for command.
+
+OPTIONS
+%s
         """
         command = args[0]
         name, info = self._get_command_info(command)
         if name != None:
             handler = info['handler']
-            print(handler.__doc__ % Filename)
+            options_help = ""
+            if 'options' in info:
+                for option in info['options']:
+                    if 'values' in self._optionHelp[option]:
+                        options_help += "    --%s=<" % option
+                        num = len(self._optionHelp[option]['values'])
+                        count = 1
+                        for value in self._optionHelp[option]['values']:
+                            options_help += "%s" % value
+                            if count < num:
+                                options_help += " | "
+                            count += 1
+                        options_help += ">\n"
+                    else:
+                        options_help += "    --%s\n" % option
+                    if 'desc' in self._optionHelp[option]:
+                        options_help += "        %s\n" % self._optionHelp[option]['desc']
+                    options_help += "\n"
+            else:
+                options_help += "    None\n"
+            print handler.__doc__ % (Filename, options_help)
         else:
             print("ERROR: Unknown command %s" % command)
 
@@ -213,6 +247,9 @@ SYNOPSIS
 DESCRIPTION
     Run unit test named <name>. Use 'all' to run all unit tests. Use 'list'
     to list available unit tests.
+
+OPTIONS
+%s
         """
         unittest = UnitTest()
         unittest.test(args[0])
@@ -226,9 +263,13 @@ SYNOPSIS
 
 DESCRIPTION
     Greet <name> with hello.
+
+OPTIONS
+%s
         """
         greet = Greetings()
-        print(greet.hello(args[0]))
+        msg = Options['include-msg']
+        print(greet.hello(args[0], msg))
 
 Filename = os.path.basename(__file__)
 CLI = CLIHandler()
